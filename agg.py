@@ -1,11 +1,7 @@
 from google.cloud import bigquery
-from config import project_id,dataset_id
-# Set up BigQuery client
-client = bigquery.Client()
+from config import project_id, dataset_id
 
-# Define dataset and project ID
-# project_id = "financial-project-453807"
-# dataset_id = "finanacial_project"  # Corrected dataset name
+client = bigquery.Client()
 
 def create_aggregation_tables():
     """Creates aggregation tables in BigQuery."""
@@ -55,7 +51,7 @@ def create_aggregation_tables():
     for table_name, query in queries.items():
         print(f"Executing query for {table_name}...")
         job = client.query(query)
-        job.result()  # Wait for the query to finish
+        job.result()
         print(f"Table {table_name} created successfully.")
 
     print("All aggregation tables created successfully!")
