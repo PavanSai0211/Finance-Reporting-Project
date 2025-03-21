@@ -1,50 +1,40 @@
+import pandas as pd
 from google.cloud import bigquery
-from google.oauth2 import service_account
-from config import project_id,dataset_id
 
-def execute_kpi_queries():
+def create_kpi_tables():
     client = bigquery.Client()
-
-    # Initialize BigQuery client
-    #client = bigquery.Client(credentials=credentials, project="financial-project-453807")
-
-    queries = [
-        """
-        CREATE OR REPLACE TABLE `financial-project-453807.finanacial_project.kpi_avg_daily_volume` AS
-        SELECT 
-            EXTRACT(YEAR FROM DATE(Date)) AS year,
-            AVG(Volume) AS avg_daily_volume
-        FROM `financial-project-453807.finanacial_project.fact_financials`
-        GROUP BY year
-        ORDER BY year;
+    
+    kpi_queries = {
+        "kpi_total_revenue": """
+            CREATE OR REPLACE TABLE `financial-project-453807.financial_project.kpi_total_revenue` AS
+            SELECT SUM(totalRevenue) AS total_revenue
+            FROM `financial-project-453807.financial_project.fact_financials`;
         """,
-        """
-        CREATE OR REPLACE TABLE `financial-project-453807.finanacial_project.kpi_avg_closing_price` AS
-        SELECT 
-          EXTRACT(YEAR FROM DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S%Ez', Date))) AS year,
-          AVG(Close) AS avg_closing_price
-        FROM `financial-project-453807.finanacial_project.fact_financials`
-        GROUP BY year
-        ORDER BY year;
+        
+        "kpi_avg_ebitda": """
+            CREATE OR REPLACE TABLE `financial-project-453807.financial_project.kpi_avg_ebitda` AS
+            SELECT AVG(ebitda) AS avg_ebitda
+            FROM `financial-project-453807.financial_project.fact_financials`;
         """,
+        
+        "kpi_market_cap_growth": """
+            CREATE OR REPLACE TABLE `financial-project-453807.financial_project.kpi_market_cap_growth` AS
+            SELECT symbol, ((MAX(marketCap) - MIN(marketCap)) / MIN(marketCap)) * 100 AS market_cap_growth
+            FROM `financial-project-453807.financial_project.fact_financials`
+            GROUP BY symbol;
+        """,
+        
+        "kpi_debt_to_equity": """
+            CREATE OR REPLACE TABLE `financial-project-453807.financial_project.kpi_debt_to_equity` AS
+            SELECT symbol, AVG(debtToEquity) AS avg_debt_to_equity
+            FROM `financial-project-453807.financial_project.fact_financials`
+            GROUP BY symbol;
         """
-        CREATE OR REPLACE TABLE `financial-project-453807.finanacial_project.kpi_yearly_report` AS
-        SELECT 
-            EXTRACT(YEAR FROM TIMESTAMP(Date)) AS year,
-            symbol,
-            SUM(totalRevenue) AS total_revenue,
-            SUM(ebitda) AS total_ebitda
-        FROM `financial-project-453807.finanacial_project.fact_financials`
-        GROUP BY 1, 2
-        ORDER BY 1, 2;
-        """
-    ]
-
-    # Execute queries
-    for query in queries:
-        query_job = client.query(query)
-        query_job.result()
-        print("Query executed successfully.")
+    }
+    
+    for table_name, query in kpi_queries.items():
+        client.query(query)
+        print(f"Table {table_name} created successfully.")
 
 if __name__ == "__main__":
-    execute_kpi_queries()
+    create_kpi_tables()
