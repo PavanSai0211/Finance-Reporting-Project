@@ -1,64 +1,42 @@
 from google.cloud import bigquery
-from google.oauth2 import service_account
-from config import project_id,dataset_id
-def execute_data_mart_queries():
+
+def create_data_marts():
     client = bigquery.Client()
-    # Define dataset ID
-    #dataset_id = "finanacial_project"  # Corrected dataset ID
-
-    queries = [
-        f"""
-        CREATE OR REPLACE TABLE `{client.project}.{dataset_id}.market_performance_mart` AS
-        SELECT 
-            f.Date,
-            f.symbol,
-            f.marketCap,
-            f.enterpriseValue,
-            f.Open,
-            f.High,
-            f.Low,
-            f.Close,
-            f.Volume,
-            sp.fiftyDayAverage,
-            sp.twoHundredDayAverage,
-            sp.fiftyTwoWeekLow,
-            sp.fiftyTwoWeekHigh
-        FROM `{client.project}.{dataset_id}.fact_financials` f
-        LEFT JOIN `{client.project}.{dataset_id}.dim_stock_performance` sp 
-            ON f.symbol = sp.symbol;
-        """,
-        f"""
-        CREATE OR REPLACE TABLE `{client.project}.{dataset_id}.dividend_payout_mart` AS
-        SELECT 
-            d.symbol,
-            d.dividendRate,
-            d.dividendYield,
-            d.payoutRatio,
-            d.fiveYearAvgDividendYield,
-            d.lastDividendValue,
-            d.lastDividendDate
-        FROM `{client.project}.{dataset_id}.dim_dividends` d;
-        """,
-        f"""
-        CREATE OR REPLACE TABLE `{client.project}.{dataset_id}.risk_governance_mart` AS
-        SELECT 
-            c.symbol,
-            c.auditRisk,
-            c.boardRisk,
-            c.compensationRisk,
-            c.shareHolderRightsRisk,
-            c.overallRisk,
-            c.governanceEpochDate,
-            c.compensationAsOfEpochDate
-        FROM `{client.project}.{dataset_id}.dim_company` c;
-        """
-    ]
-
-    # Execute queries
-    for query in queries:
+    dataset_id = "financial-project-453807.financial_project"
+    
+    queries = {
+        "Profitability_DataMart": """
+            CREATE OR REPLACE TABLE `{dataset_id}.Profitability_DataMart` AS
+            SELECT symbol, totalRevenue, grossProfits, ebitda, returnOnAssets, returnOnEquity, earningsGrowth, revenueGrowth
+            FROM `{dataset_id}.fact_financials`;
+        """.format(dataset_id=dataset_id),
+        
+        "Market_Performance_DataMart": """
+            CREATE OR REPLACE TABLE `{dataset_id}.Market_Performance_DataMart` AS
+            SELECT symbol, Date, Open, High, Low, Close, Volume, fiftyTwoWeekLow, fiftyTwoWeekHigh, fiftyDayAverage, twoHundredDayAverage
+            FROM `{dataset_id}.fact_financials`
+            JOIN `{dataset_id}.dim_stock_performance` USING (symbol);
+        """.format(dataset_id=dataset_id),
+        
+        "Risk_Governance_DataMart": """
+            CREATE OR REPLACE TABLE `{dataset_id}.Risk_Governance_DataMart` AS
+            SELECT symbol, debtToEquity, currentRatio, quickRatio, auditRisk, boardRisk, compensationRisk, shareHolderRightsRisk, overallRisk
+            FROM `{dataset_id}.fact_financials`
+            JOIN `{dataset_id}.dim_company` USING (symbol);
+        """.format(dataset_id=dataset_id),
+        
+        "Dividend_Analysis_DataMart": """
+            CREATE OR REPLACE TABLE `{dataset_id}.Dividend_Analysis_DataMart` AS
+            SELECT symbol, dividendRate, dividendYield, exDividendDate, payoutRatio, fiveYearAvgDividendYield, lastDividendValue, lastDividendDate
+            FROM `{dataset_id}.dim_dividends`;
+        """.format(dataset_id=dataset_id)
+    }
+    
+    for name, query in queries.items():
+        print(f"Creating {name}...")
         query_job = client.query(query)
         query_job.result()
-        print("Query executed successfully.")
+        print(f"{name} created successfully!")
 
 if __name__ == "__main__":
-    execute_data_mart_queries()
+    create_data_marts()
