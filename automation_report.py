@@ -5,8 +5,17 @@ import time
 from email.message import EmailMessage
 from google.cloud import bigquery
 from google.oauth2 import service_account
-from config import EMAIL_PASSWORD, dataset_id
+from dotenv import load_dotenv
 import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch variables
+project_id = os.getenv("PROJECT_ID")
+dataset_id = os.getenv("DATASET_ID")
+email_password = os.getenv("EMAIL_PASSWORD")
+
 
 # Initialize BigQuery client
 client = bigquery.Client()
@@ -50,7 +59,8 @@ def send_email(report_file, report_type):
         return
 
     sender_email = "psspsp7@gmail.com"
-    password = EMAIL_PASSWORD
+    password = email_password
+
     receiver_emails = ["pavansaipatel.2002@gmail.com"]
 
     subject = f"Automated {report_type.capitalize()} Report"
