@@ -54,7 +54,7 @@ elif menu == "Schema":
     - **Aggregates:** Pre-computed summaries for faster analysis.
     - **Data Marts:** Business-specific structured data for performance analysis.
     """)
-    st.image("schema.png", caption="Financial Reporting Schema", use_container_width=True)
+    st.image("star_schema.png", caption="Financial Reporting Schema", use_container_width=True)
 
 # Visualizations Section
 elif menu == "Visualizations":
@@ -103,8 +103,8 @@ elif menu == "KPIs":
         st.write("### **Fetched KPI Data:**")
         st.dataframe(df_kpi)
 
-        st.write("### **Column Names & Data Types:**")
-        st.write(df_kpi.dtypes)
+        # st.write("### **Column Names & Data Types:**")
+        # st.write(df_kpi.dtypes)
 
         figs = []
 
@@ -189,7 +189,7 @@ elif menu == "Data Marts":
 
 elif menu == "Report Automation":
     st.title("Automated Financial Reports")
-    report_type = st.selectbox("Select Report Type", ["Monthly", "Yearly"])
+    report_type = st.selectbox("Select Report Type", ["Monthly","Yearly"])
 
     if st.button("Generate & Send Report"):
         report_file = generate_report(report_type.lower())
