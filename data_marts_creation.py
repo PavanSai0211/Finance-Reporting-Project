@@ -1,8 +1,17 @@
 from google.cloud import bigquery
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch variables
+project_id = os.getenv("PROJECT_ID")
+dataset_id = os.getenv("DATASET_ID")
+email_password = os.getenv("EMAIL_PASSWORD")
 
 def create_data_marts():
     client = bigquery.Client()
-    dataset_id = "financial-project-453807.financial_project"
     
     queries = {
         "Profitability_DataMart": """
