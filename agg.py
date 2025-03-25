@@ -1,8 +1,18 @@
 from google.cloud import bigquery
-from config import project_id, dataset_id
+from dotenv import load_dotenv
+import os
+
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch variables
+project_id = os.getenv("PROJECT_ID")
+dataset_id = os.getenv("DATASET_ID")
+email_password = os.getenv("EMAIL_PASSWORD")
+
 
 client = bigquery.Client()
-
 def create_aggregation_tables():
     """Creates aggregation tables in BigQuery."""
     
