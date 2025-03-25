@@ -1,13 +1,24 @@
 
 from google.cloud import bigquery
-from config import project_id, dataset_id
+from dotenv import load_dotenv
+import os
 import pandas_gbq
 from pandas_gbq import to_gbq
 from fact_dim_creation import fact_financials, dim_company,dim_dividends,dim_location,dim_market,dim_stock_performance
+
+
+
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch variables
+project_id = os.getenv("PROJECT_ID")
+dataset_id = os.getenv("DATASET_ID")
+email_password = os.getenv("EMAIL_PASSWORD")
+
 # Set up BigQuery client
 client = bigquery.Client(project=project_id)
-
-
 
 # Dictionary of dimension tables
 tables = {
