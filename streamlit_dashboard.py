@@ -4,10 +4,20 @@ import plotly.express as px
 import plotly.graph_objects as go
 from google.cloud import bigquery
 from automation_report import generate_report, send_email
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch variables
+project_id = os.getenv("PROJECT_ID")
+dataset_id = os.getenv("DATASET_ID")
+email_password = os.getenv("EMAIL_PASSWORD")
+
 
 # Initialize BigQuery Client
 client = bigquery.Client()
-dataset_id = "financial_project"
 
 # Function to fetch data from BigQuery
 @st.cache_data
@@ -54,15 +64,15 @@ elif menu == "Schema":
     - **Aggregates:** Pre-computed summaries for faster analysis.
     - **Data Marts:** Business-specific structured data for performance analysis.
     """)
-    st.image("star_schema.png", caption="Financial Reporting Schema", use_container_width=True)
+    st.image("star_schema.png", caption="Financial Reporting Star Schema", use_container_width=True)
 
 # Visualizations Section
 elif menu == "Visualizations":
     st.title("Financial Data Visualizations")
     df = load_data()
     
-    st.write("Dataset Preview:")
-    st.write(df.head())
+    # st.write("Dataset Preview:")
+    # st.write(df.head())
 
     # Revenue vs EBITDA Trend
     if "total_revenue" in df.columns and "total_ebitda" in df.columns:
