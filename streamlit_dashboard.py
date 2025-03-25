@@ -7,10 +7,10 @@ from automation_report import generate_report, send_email
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env file
+# Loading environment variables from .env file
 load_dotenv()
 
-# Fetch variables
+# Fetching variables
 project_id = os.getenv("PROJECT_ID")
 dataset_id = os.getenv("DATASET_ID")
 email_password = os.getenv("EMAIL_PASSWORD")
@@ -18,6 +18,7 @@ email_password = os.getenv("EMAIL_PASSWORD")
 
 # Initialize BigQuery Client
 client = bigquery.Client()
+
 
 # Function to fetch data from BigQuery
 @st.cache_data
@@ -196,7 +197,7 @@ elif menu == "Data Marts":
     df = fetch_data(query)
     st.write(df)
 
-
+#automation reporting code
 elif menu == "Report Automation":
     st.title("Automated Financial Reports")
     report_type = st.selectbox("Select Report Type", ["Monthly","Yearly"])
